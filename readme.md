@@ -18,7 +18,7 @@ for pl in c.playlists:
 
 ## Search
 
-Faster (avoid parsing of individual urls) and more advanced (not only videos) 
+Faster (avoid parsing of individual urls) and more advanced (not only videos)
 
 ```python
 from tutubo import YoutubeSearch
@@ -36,7 +36,7 @@ def search_yt(query, parse=False):
     }
 
     s = YoutubeSearch(query, preview=not parse)
-    for v in s.iterate_results():
+    for v in s.iterate_youtube():
         if isinstance(v, YoutubeMixPreview):
             pl = {'playlistId': v.playlist_id,
                   'title': v.title,

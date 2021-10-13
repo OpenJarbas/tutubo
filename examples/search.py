@@ -1,8 +1,8 @@
-from tutubo import YoutubeSearch
+from tutubo import YoutubeSearch, search_yt
 from tutubo.models import *
 
 
-def search_yt(query, parse=False):
+def search(query, parse=False, max_res=50):
     res = {
         'channels': [],
         'playlists': [],
@@ -11,57 +11,26 @@ def search_yt(query, parse=False):
         'related_videos': [],
         'videos': []
     }
-
-    s = YoutubeSearch(query, preview=not parse)
-    for v in s.iterate_results():
+    for v in search_yt(query, parse=parse, max_res=max_res, as_dict=False):
         if isinstance(v, YoutubeMixPreview):
-            pl = {'playlistId': v.playlist_id,
-                  'title': v.title,
-                  'url': v.playlist_url,
-                  "image": v.thumbnail_url,
-                  'featured_videos': v.featured_videos}
-            res["mix"].append(pl)
-        elif isinstance(v, RelatedSearch):
-            pl = {'query': v.query,
-                  'image': v.thumbnail_url}
-            res["related_queries"].append(pl)
+            res["mix"].append(v.as_dict)
+        elif isinstance(v, RelatedSearch) or isinstance(v, YoutubeSearch):
+            res["related_queries"].append(v.as_dict)
         elif isinstance(v, ChannelPreview) or isinstance(v, Channel):
-            pl = {'channelId': v.channel_id,
-                  'title': v.title,
-                  'image': v.thumbnail_url,
-                  'url': v.channel_url}
-            res["channels"].append(pl)
+            res["channels"].append(v.as_dict)
         elif isinstance(v, PlaylistPreview) or isinstance(v, Playlist):
-            pl = {'playlistId': v.playlist_id,
-                  'title': v.title,
-                  'url': v.playlist_url,
-                  "image": v.thumbnail_url,
-                  'featured_videos': v.featured_videos}
-            res["playlists"].append(pl)
+            res["playlists"].append(v.as_dict)
         elif isinstance(v, RelatedVideoPreview) or isinstance(v, RelatedVideo):
-            vid = {'length': v.length,
-                   'keywords': v.keywords,
-                   'image': v.thumbnail_url,
-                   'title': v.title,
-                   "author": v.author,
-                   'url': v.watch_url,
-                   'videoId': v.video_id}
-            res["related_videos"].append(vid)
+            res["related_videos"].append(v.as_dict)
         else:
-            vid = {'length': v.length,
-                   'keywords': v.keywords,
-                   'image': v.thumbnail_url,
-                   'title': v.title,
-                   "author": v.author,
-                   'url': v.watch_url,
-                   'videoId': v.video_id}
-            res["videos"].append(vid)
-
+            res["videos"].append(v.as_dict)
     return res
 
+from pprint import pprint
 
-res = search_yt("rob zombie", parse=False)
-print(res)
+res = search("rob zombie", parse=False, max_res=50)
+
+pprint(res)
 """
 {'channels': [{'channelId': 'UChWc6ilKdVM1Cz--wGMW_Zg',
                'image': 'https://i.ytimg.com/vi/aQxaGpJNfyA/sddefault.jpg',

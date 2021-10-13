@@ -8,23 +8,21 @@ from pytube.helpers import uniqueify, cache, DeferredGeneratorList
 
 
 class YoutubePreview:
-    pass
+    def __init__(self, renderer_data):
+        self._raw_data = renderer_data
 
 
 class PlaylistPreview(YoutubePreview):
-    def __init__(self, renderer_data):
-        self._renderer_data = renderer_data
-
     def get(self):
         return Playlist(self.playlist_url)
 
     @property
     def title(self):
-        return self._renderer_data["title"]['simpleText']
+        return self._raw_data["title"]['simpleText']
 
     @property
     def playlist_id(self):
-        return self._renderer_data["playlistId"]
+        return self._raw_data["playlistId"]
 
     @property
     def playlist_url(self):
@@ -32,12 +30,12 @@ class PlaylistPreview(YoutubePreview):
 
     @property
     def video_count(self):
-        return self._renderer_data['videoCount']
+        return self._raw_data['videoCount']
 
     @property
     def featured_videos(self):
         videos = []
-        for v in self._renderer_data['videos']:
+        for v in self._raw_data['videos']:
             v = v['childVideoRenderer']
             videos.append({
                 "videoId": v['videoId'],
@@ -53,7 +51,18 @@ class PlaylistPreview(YoutubePreview):
 
     @property
     def thumbnails(self):
-        return [t['thumbnails'][0] for t in self._renderer_data['thumbnails']]
+        return [t['thumbnails'][0] for t in self._raw_data['thumbnails']]
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def as_dict(self):
+        return {'playlistId': self.playlist_id,
+                'title': self.title,
+                'url': self.playlist_url,
+                "image": self.thumbnail_url,
+                'featured_videos': self.featured_videos}
 
 
 class YoutubeMixPreview(PlaylistPreview):
@@ -63,28 +72,34 @@ class YoutubeMixPreview(PlaylistPreview):
 
     @property
     def thumbnails(self):
-        return self._renderer_data['thumbnail']['thumbnails']
+        return self._raw_data['thumbnail']['thumbnails']
+
+    @property
+    def as_dict(self):
+        return {'playlistId': self.playlist_id,
+                'title': self.title,
+                'url': self.playlist_url,
+                "image": self.thumbnail_url,
+                'featured_videos': self.featured_videos}
 
 
 class ChannelPreview(YoutubePreview):
-    def __init__(self, renderer_data):
-        self._renderer_data = renderer_data
 
     def get(self):
         return Channel(self.channel_url)
 
     @property
     def title(self):
-        return self._renderer_data["title"]['simpleText']
+        return self._raw_data["title"]['simpleText']
 
     @property
     def description(self):
         return "".join(r["text"] for r in
-                       self._renderer_data['descriptionSnippet']['runs'])
+                       self._raw_data['descriptionSnippet']['runs'])
 
     @property
     def channel_id(self):
-        return self._renderer_data["channelId"]
+        return self._raw_data["channelId"]
 
     @property
     def channel_url(self):
@@ -92,7 +107,7 @@ class ChannelPreview(YoutubePreview):
 
     @property
     def video_count(self):
-        return int(self._renderer_data['videoCountText']["runs"][0]["text"])
+        return int(self._raw_data['videoCountText']["runs"][0]["text"])
 
     @property
     def thumbnail_url(self):
@@ -100,12 +115,20 @@ class ChannelPreview(YoutubePreview):
 
     @property
     def thumbnails(self):
-        return self._renderer_data['thumbnail']['thumbnails']
+        return self._raw_data['thumbnail']['thumbnails']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def as_dict(self):
+        return {'channelId': self.channel_id,
+                'title': self.title,
+                'image': self.thumbnail_url,
+                'url': self.channel_url}
 
 
 class VideoPreview(YoutubePreview):
-    def __init__(self, renderer_data):
-        self._renderer_data = renderer_data
 
     def get(self):
         return Video(self.watch_url)
@@ -113,16 +136,16 @@ class VideoPreview(YoutubePreview):
     @property
     def title(self):
         return "".join(r["text"] for r in
-                       self._renderer_data['title']['runs'])
+                       self._raw_data['title']['runs'])
 
     @property
     def author(self):
         return "".join(r["text"] for r in
-                       self._renderer_data['ownerText']['runs'])
+                       self._raw_data['ownerText']['runs'])
 
     @property
     def channel_id(self):
-        return self._renderer_data['ownerText']['runs'][0][
+        return self._raw_data['ownerText']['runs'][0][
             'navigationEndpoint']['commandMetadata'][
             'webCommandMetadata']['url']
 
@@ -132,7 +155,7 @@ class VideoPreview(YoutubePreview):
 
     @property
     def video_id(self):
-        return self._renderer_data['videoId']
+        return self._raw_data['videoId']
 
     @property
     def watch_url(self):
@@ -142,14 +165,14 @@ class VideoPreview(YoutubePreview):
     def view_count(self):
         # Livestreams have "runs", non-livestreams have "simpleText",
         #  and scheduled releases do not have 'viewCountText'
-        if 'viewCountText' in self._renderer_data:
-            if 'runs' in self._renderer_data['viewCountText']:
+        if 'viewCountText' in self._raw_data:
+            if 'runs' in self._raw_data['viewCountText']:
                 vid_view_count_text = \
-                    self._renderer_data['viewCountText']['runs'][0][
+                    self._raw_data['viewCountText']['runs'][0][
                         'text']
             else:
                 vid_view_count_text = \
-                    self._renderer_data['viewCountText']['simpleText']
+                    self._raw_data['viewCountText']['simpleText']
             # Strip ' views' text, then remove commas
             stripped_text = vid_view_count_text.split()[0].replace(
                 ',', '')
@@ -159,8 +182,8 @@ class VideoPreview(YoutubePreview):
 
     @property
     def length(self):
-        if 'lengthText' in self._renderer_data:
-            pts = self._renderer_data['lengthText']['simpleText'].split(":")
+        if 'lengthText' in self._raw_data:
+            pts = self._raw_data['lengthText']['simpleText'].split(":")
             h, m, s = 0, 0, 0
             if len(pts) == 3:
                 h, m, s = pts
@@ -181,14 +204,33 @@ class VideoPreview(YoutubePreview):
     def keywords(self):
         return []  # just for api compatibility, requires parsing url!
 
+    def __str__(self):
+        return self.title
+
+    @property
+    def as_dict(self):
+        return {'length': self.length,
+                'keywords': self.keywords,
+                'image': self.thumbnail_url,
+                'title': self.title,
+                "author": self.author,
+                'url': self.watch_url,
+                'videoId': self.video_id}
+
 
 class RelatedVideoPreview(VideoPreview):
-    pass
+    @property
+    def as_dict(self):
+        return {'length': self.length,
+                'keywords': self.keywords,
+                'image': self.thumbnail_url,
+                'title': self.title,
+                "author": self.author,
+                'url': self.watch_url,
+                'videoId': self.video_id}
 
 
 class RelatedSearch(YoutubePreview):
-    def __init__(self, renderer_data):
-        self._renderer_data = renderer_data
 
     def get(self, preview=True):
         from tutubo.search import YoutubeSearch
@@ -196,7 +238,7 @@ class RelatedSearch(YoutubePreview):
 
     @property
     def query(self):
-        return "".join(r["text"] for r in self._renderer_data['query']['runs'])
+        return "".join(r["text"] for r in self._raw_data['query']['runs'])
 
     @property
     def thumbnail_url(self):
@@ -204,7 +246,15 @@ class RelatedSearch(YoutubePreview):
 
     @property
     def thumbnails(self):
-        return self._renderer_data['thumbnail']['thumbnails']
+        return self._raw_data['thumbnail']['thumbnails']
+
+    def __str__(self):
+        return self.query
+
+    @property
+    def as_dict(self):
+        return {'query': self.query,
+                'image': self.thumbnail_url}
 
 
 class Playlist(_Pl):
@@ -264,15 +314,15 @@ class Playlist(_Pl):
     def featured_videos(self):
         videos = []
         idx = 0
-        for v in self.videos:
+        for vid in self.videos:
             if idx > 5:
                 break
             try:
                 videos.append({
-                    "videoId": v.video_id,
-                    "url": v.watch_url,
-                    "image": v.thumbnail_url,
-                    "title": v.title
+                    "videoId": vid.video_id,
+                    "url": vid.watch_url,
+                    "image": vid.thumbnail_url,
+                    "title": vid.title
                 })
                 idx += 1
             except VideoUnavailable:
@@ -282,6 +332,14 @@ class Playlist(_Pl):
     @property
     def thumbnail_url(self):
         return self.featured_videos[0]["image"]
+
+    @property
+    def as_dict(self):
+        return {'playlistId': self.playlist_id,
+                'title': self.title,
+                'url': self.playlist_url,
+                "image": self.thumbnail_url,
+                'featured_videos': self.featured_videos}
 
 
 class Channel(Playlist, _Ch):
@@ -379,10 +437,33 @@ class Channel(Playlist, _Ch):
         """
         return DeferredGeneratorList(self.playlist_url_generator())
 
+    @property
+    def as_dict(self):
+        return {'channelId': self.channel_id,
+                'title': self.title,
+                'image': self.thumbnail_url,
+                'url': self.channel_url}
+
 
 class Video(_Yt):
-    pass
+    @property
+    def as_dict(self):
+        return {'length': self.length,
+                'keywords': self.keywords,
+                'image': self.thumbnail_url,
+                'title': self.title,
+                "author": self.author,
+                'url': self.watch_url,
+                'videoId': self.video_id}
 
 
 class RelatedVideo(Video):
-    pass
+    @property
+    def as_dict(self):
+        return {'length': self.length,
+                'keywords': self.keywords,
+                'image': self.thumbnail_url,
+                'title': self.title,
+                "author": self.author,
+                'url': self.watch_url,
+                'videoId': self.video_id}
