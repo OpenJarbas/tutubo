@@ -97,10 +97,11 @@ class YoutubeSearch(_Search):
                         search_type in [SearchType.ALL,
                                         SearchType.YOUTUBE,
                                         SearchType.RELATED_VIDEOS]:
-                    for v in video_details['shelfRenderer']['content'][
-                        'verticalListRenderer']['items']:
-                        yield RelatedVideoPreview(v['videoRenderer'])
-                    continue
+                    content = video_details['shelfRenderer']['content'].get("verticalListRenderer")
+                    if content:
+                        for v in content['items']:
+                            yield RelatedVideoPreview(v['videoRenderer'])
+                        continue
 
                 # Skip auto-generated "mix" playlist results
                 elif 'radioRenderer' in video_details and \

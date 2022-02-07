@@ -88,7 +88,7 @@ class MusicPlaylist(YTMusicResult):
             ]
         elif "songs" in self._raw_data:
             return [
-                MusicTrack(t) for t in self._raw_data["songs"]["results"]
+                MusicTrack(t) for t in self._raw_data["songs"].get("results", [])
                 if t.get("videoId")
             ]
         return []
