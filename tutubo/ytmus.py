@@ -1,6 +1,42 @@
 import json
-from tutubo.models import YoutubePreview, Video
 from ytmusicapi import YTMusic
+
+from tutubo.models import YoutubePreview, Video
+
+_YTMUS = None
+
+
+def _get_ytmus(max_retries=5):
+    """ attempt at avoiding rate limiting errors, avoid creating YTMusic objects unnecessarily
+
+      for v in search_yt_music(phrase, as_dict=False):
+      File "/usr/lib/python3.10/site-packages/tutubo/ytmus.py", line 127, in search_yt_music
+        ytmusic = YTMusic()
+      File "/usr/lib/python3.10/site-packages/ytmusicapi/ytmusic.py", line 96, in __init__
+        self.headers.update(get_visitor_id(self._send_get_request))
+      File "/usr/lib/python3.10/site-packages/ytmusicapi/helpers.py", line 63, in get_visitor_id
+        response = request_func(YTM_DOMAIN)
+      File "/usr/lib/python3.10/site-packages/ytmusicapi/ytmusic.py", line 146, in _send_get_request
+        response = requests.get(url, params, headers=self.headers, proxies=self.proxies)
+      File "/usr/lib/python3.10/site-packages/requests/api.py", line 75, in get
+        return request('get', url, params=params, **kwargs)
+      (...)
+      File "/usr/lib/python3.10/site-packages/requests/adapters.py", line 519, in send
+        raise ConnectionError(e, request=request)
+    requests.exceptions.ConnectionError: HTTPSConnectionPool(host='music.youtube.com', port=443): Max retries exceeded with url: / (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x7f940cece0>: Failed to establish a new connection: [Errno -2] Name or service not known'))
+
+    """
+    global _YTMUS
+    if _YTMUS:
+        return _YTMUS
+    for i in range(max_retries):
+        try:
+            _YTMUS = YTMusic()
+            break
+        except:  # rate limited
+            sleep(0.5 * (i + 1))
+            continue
+    return _YTMUS
 
 
 class YTMusicResult(YoutubePreview):
@@ -123,8 +159,8 @@ class MusicArtist(MusicPlaylist):
         }
 
 
-def search_yt_music(query, as_dict=True):
-    ytmusic = YTMusic()
+def search_yt_music(query, as_dict=True, n_retries=3):
+    ytmusic = _get_ytmus(n_retries)
     for r in ytmusic.search(query):
         if r["resultType"] == "video":
             if as_dict:
