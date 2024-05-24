@@ -331,7 +331,10 @@ class Playlist(_Pl):
 
     @property
     def thumbnail_url(self):
-        return self.featured_videos[0]["image"]
+        try:
+            return self.featured_videos[0]["image"]
+        except:
+            return None
 
     @property
     def as_dict(self):
