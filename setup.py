@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='tutubo',
-    version='0.0.2a1',
+    version='0.0.2',
     packages=['tutubo'],
     url='https://github.com/OpenJarbas/tutubo',
     license='Apache',
