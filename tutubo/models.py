@@ -231,8 +231,8 @@ class VideoPreview(YoutubePreview):
             elif len(pts) == 1:
                 s = pts
             return int(s) + \
-                   60 * int(m) + \
-                   60 * 60 * int(h)
+                60 * int(m) + \
+                60 * 60 * int(h)
         return 0
 
     @property
@@ -502,7 +502,21 @@ class Channel(Playlist, _Ch):
                 'url': self.channel_url}
 
 
+def video_description_info(watch_html: str):
+    try:
+        yt_description_result = extract.regex_search(r'"(?<=description":{"simpleText":")([^}]+)', watch_html, group=0)
+    except extract.RegexMatchError:
+        yt_description_result = None
+    return yt_description_result
+
+
 class Video(_Yt):
+    @property
+    def description(self) -> str:
+        """Get the video description."""
+        return self.vid_info.get("videoDetails", {}).get("shortDescription") or \
+            video_description_info(self.watch_html).replace('\\n', '\n')
+
     @property
     def as_dict(self):
         return {'length': self.length,
