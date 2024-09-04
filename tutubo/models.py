@@ -1,11 +1,58 @@
 import json
-from typing import List, Tuple, Optional, Iterable
 import re
+from typing import List, Tuple, Optional, Iterable
 
+# Patches since upstream is abandoned (TODO time to fork ?)
+import pytube.cipher
+import pytube.innertube
 from pytube import YouTube as _Yt, Channel as _Ch, Playlist as _Pl
 from pytube import extract
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import uniqueify, cache, DeferredGeneratorList
+
+
+def get_throttling_function_name(js: str) -> str:
+    """Extract the name of the function that computes the throttling parameter.
+
+    :param str js:
+        The contents of the base.js asset file.
+    :rtype: str
+    :returns:
+        The name of the function used to compute the throttling parameter.
+    """
+    function_patterns = [
+        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
+        # https://github.com/yt-dlp/yt-dlp/commit/48416bc4a8f1d5ff07d5977659cb8ece7640dcd8
+        # var Bpa = [iha];
+        # ...
+        # a.C && (b = a.get("n")) && (b = Bpa[0](b), a.set("n", b),
+        # Bpa.length || iha("")) }};
+        # In the above case, `iha` is the relevant function name
+        r'a\.[a-zA-Z]\s*&&\s*\([a-z]\s*=\s*a\.get\("n"\)\)\s*&&.*?\|\|\s*([a-z]+)',
+        r'\([a-z]\s*=\s*([a-zA-Z0-9$]+)(\[\d+\])\([a-z]\)',
+    ]
+    for pattern in function_patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(js)
+        if function_match:
+            if len(function_match.groups()) == 1:
+                return function_match.group(1)
+            idx = function_match.group(2)
+            if idx:
+                idx = idx.strip("[]")
+                array = re.search(
+                    r'var {nfunc}\s*=\s*(\[.+?\]);'.format(
+                        nfunc=re.escape(function_match.group(1))),
+                    js
+                )
+                if array:
+                    array = array.group(1).strip("[]").split(",")
+                    array = [x.strip() for x in array]
+                    return array[int(idx)]
+
+    raise extract.RegexMatchError(
+        caller="get_throttling_function_name", pattern="multiple"
+    )
 
 
 def extract_channel_name(url: str) -> str:
@@ -42,8 +89,14 @@ def extract_channel_name(url: str) -> str:
     )
 
 
-# patch channel parser
 extract.channel_name = extract_channel_name
+pytube.cipher.get_throttling_function_name = get_throttling_function_name
+pytube.innertube._default_clients["ANDROID"]["context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["IOS"]["context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["ANDROID_EMBED"]["context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["IOS_EMBED"]["context"]["client"]["clientVersion"] = "19.08.35"
+pytube.innertube._default_clients["IOS_MUSIC"]["context"]["client"]["clientVersion"] = "6.41"
+pytube.innertube._default_clients["ANDROID_MUSIC"] = pytube.innertube._default_clients["ANDROID_CREATOR"]
 
 
 class YoutubePreview:
@@ -436,7 +489,8 @@ class Channel(Playlist, _Ch):
             pass
 
         try:
-            continuation = playlists[-1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']
+            continuation = playlists[-1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand'][
+                'token']
             playlists = playlists[:-1]
         except (KeyError, IndexError):
             # if there is an error, no continuation is available
@@ -446,7 +500,7 @@ class Channel(Playlist, _Ch):
             if 'gridPlaylistRenderer' in p:
                 p['playlistId'] = p['gridPlaylistRenderer']['playlistId']
             elif 'lockupViewModel' in p:
-                #p["title"] = p['lockupViewModel']['metadata']['lockupMetadataViewModel']['title']['content']
+                # p["title"] = p['lockupViewModel']['metadata']['lockupMetadataViewModel']['title']['content']
                 p['playlistId'] = p['lockupViewModel']['contentId']
         # remove duplicates
         return (

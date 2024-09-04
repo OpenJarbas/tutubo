@@ -1,4 +1,5 @@
 import json
+import time
 from ytmusicapi import YTMusic
 
 from tutubo.models import YoutubePreview, Video
@@ -34,7 +35,7 @@ def _get_ytmus(max_retries=5):
             _YTMUS = YTMusic()
             break
         except:  # rate limited
-            sleep(0.5 * (i + 1))
+            time.sleep(0.5 * (i + 1))
             continue
     return _YTMUS
 
