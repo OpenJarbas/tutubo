@@ -1,10 +1,54 @@
 import json
 from typing import List, Tuple, Optional, Iterable
+import re
 
 from pytube import YouTube as _Yt, Channel as _Ch, Playlist as _Pl
 from pytube import extract
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import uniqueify, cache, DeferredGeneratorList
+
+
+def extract_channel_name(url: str) -> str:
+    """Extract the ``channel_name`` or ``channel_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://youtube.com/@{channel_name}/*`
+    - :samp:`https://youtube.com/c/{channel_name}/*`
+    - :samp:`https://youtube.com/channel/{channel_id}/*
+    - :samp:`https://youtube.com/u/{channel_name}/*`
+    - :samp:`https://youtube.com/user/{channel_id}/*
+
+    :param str url:
+        A YouTube url containing a channel name.
+    :rtype: str
+    :returns:
+        YouTube channel name.
+    """
+    patterns = [
+        r"(?:\/@([\w\d_\-]+)(\/.*)?)",
+        r"(?:\/(c)\/([%\d\w_\-]+)(\/.*)?)",
+        r"(?:\/(channel)\/([%\w\d_\-]+)(\/.*)?)",
+        r"(?:\/(u)\/([%\d\w_\-]+)(\/.*)?)",
+        r"(?:\/(user)\/([%\w\d_\-]+)(\/.*)?)"
+    ]
+    for pattern in patterns:
+        regex = re.compile(pattern)
+        function_match = regex.search(url)
+        if function_match:
+            if "/@" in url:
+                return f'/@{function_match.group(1)}'
+            uri_style = function_match.group(1)
+            uri_identifier = function_match.group(2)
+            return f'/{uri_style}/{uri_identifier}'
+
+    raise extract.RegexMatchError(
+        caller="channel_name", pattern="patterns"
+    )
+
+
+# patch channel parser
+extract.channel_name = extract_channel_name
 
 
 class YoutubePreview:
@@ -392,7 +436,21 @@ class Channel(Playlist, _Ch):
         except (KeyError, IndexError, TypeError):
             pass
 
-        continuation = None
+        try:
+            continuation = playlists[-1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']
+            playlists = playlists[:-1]
+        except (KeyError, IndexError):
+            # if there is an error, no continuation is available
+            continuation = None
+
+        for p in playlists:
+            if 'gridPlaylistRenderer' in p:
+                p['playlistId'] = p['gridPlaylistRenderer']['playlistId']
+            elif 'lockupViewModel' in p:
+                # TODO - i got this one once! but can not replicate consistently...
+                # implement once we can get the output again
+                pass
+
         # remove duplicates
         return (
             uniqueify(
@@ -403,7 +461,7 @@ class Channel(Playlist, _Ch):
                             f"/playlist?list="
                             f"{x['gridPlaylistRenderer']['playlistId']}"
                         ),
-                        playlists
+                        [p for p in playlists if 'gridPlaylistRenderer' in p]
                     )
                 ),
             ),
