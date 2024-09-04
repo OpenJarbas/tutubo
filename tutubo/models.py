@@ -371,16 +371,26 @@ class Channel(Playlist, _Ch):
 
         # this is the json tree structure, if the json was extracted from
         # html
+        playlists = []
         try:
-            playlists = initial_data["contents"][
-                "twoColumnBrowseResultsRenderer"][
-                "tabs"][2]["tabRenderer"]["content"][
-                "sectionListRenderer"]["contents"][0][
-                "itemSectionRenderer"]["contents"][0][
-                'shelfRenderer']["content"][
-                'horizontalListRenderer']["items"]
+            tabs = initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"]
+            for t in tabs:
+                if "content" not in t["tabRenderer"]:
+                    continue
+                data = t["tabRenderer"]["content"]
+                if "sectionListRenderer" not in t["tabRenderer"]["content"]:
+                    continue
+                for c in data["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"]:
+                    if 'shelfRenderer' in c:
+                        playlists = c['shelfRenderer']["content"]['horizontalListRenderer']["items"]
+                        break
+                    elif 'gridRenderer' in c:
+                        playlists = c['gridRenderer']["items"]
+                        break
+                if playlists:
+                    break
         except (KeyError, IndexError, TypeError):
-            playlists = []
+            pass
 
         continuation = None
         # remove duplicates
