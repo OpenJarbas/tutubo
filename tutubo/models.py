@@ -1,10 +1,49 @@
 import json
 from typing import List, Tuple, Optional, Iterable
+import re
 
 from pytube import YouTube as _Yt, Channel as _Ch, Playlist as _Pl
 from pytube import extract
 from pytube.exceptions import VideoUnavailable
 from pytube.helpers import uniqueify, cache, DeferredGeneratorList
+
+
+def extract_channel_name(url: str) -> str:
+    """Extract the ``channel_name`` or ``channel_id`` from a YouTube url.
+
+    This function supports the following patterns:
+
+    - :samp:`https://youtube.com/{channel_name}/*`
+    - :samp:`https://youtube.com/@{channel_name}/*`
+    - :samp:`https://youtube.com/c/{channel_name}/*`
+    - :samp:`https://youtube.com/channel/{channel_id}/*
+    - :samp:`https://youtube.com/c/@{channel_name}/*`
+    - :samp:`https://youtube.com/channel/@{channel_id}/*
+    - :samp:`https://youtube.com/u/{channel_name}/*`
+    - :samp:`https://youtube.com/user/{channel_id}/*
+
+    :param str url:
+        A YouTube url containing a channel name.
+    :rtype: str
+    :returns:
+        YouTube channel name.
+    """
+    pattern = r"(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:(user|channel|c)(?:\/))?\@?([%\d\w_\-]+)"
+    regex = re.compile(pattern)
+    function_match = regex.search(url)
+    if function_match:
+        uri_style = function_match.group(1)
+        uri_style = uri_style if uri_style else "c"
+        uri_identifier = function_match.group(2)
+        return f'/{uri_style}/{uri_identifier}'
+
+    raise extract.RegexMatchError(
+        caller="channel_name", pattern="patterns"
+    )
+
+
+# patch channel parser
+extract.channel_name = extract_channel_name
 
 
 class YoutubePreview:
@@ -197,6 +236,10 @@ class VideoPreview(YoutubePreview):
         return 0
 
     @property
+    def is_live(self) -> bool:
+        return self.length == 0
+
+    @property
     def thumbnail_url(self):
         return f"https://img.youtube.com/vi/{self.video_id}/default.jpg"
 
@@ -371,32 +414,43 @@ class Channel(Playlist, _Ch):
 
         # this is the json tree structure, if the json was extracted from
         # html
+        playlists = []
         try:
-            playlists = initial_data["contents"][
-                "twoColumnBrowseResultsRenderer"][
-                "tabs"][2]["tabRenderer"]["content"][
-                "sectionListRenderer"]["contents"][0][
-                "itemSectionRenderer"]["contents"][0][
-                'shelfRenderer']["content"][
-                'horizontalListRenderer']["items"]
+            tabs = initial_data["contents"]["twoColumnBrowseResultsRenderer"]["tabs"]
+            for t in tabs:
+                if "content" not in t["tabRenderer"]:
+                    continue
+                data = t["tabRenderer"]["content"]
+                if "sectionListRenderer" not in t["tabRenderer"]["content"]:
+                    continue
+                for c in data["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"]:
+                    if 'shelfRenderer' in c:
+                        playlists = c['shelfRenderer']["content"]['horizontalListRenderer']["items"]
+                        break
+                    elif 'gridRenderer' in c:
+                        playlists = c['gridRenderer']["items"]
+                        break
+                if playlists:
+                    break
         except (KeyError, IndexError, TypeError):
-            playlists = []
+            pass
 
-        continuation = None
+        try:
+            continuation = playlists[-1]['continuationItemRenderer']['continuationEndpoint']['continuationCommand']['token']
+            playlists = playlists[:-1]
+        except (KeyError, IndexError):
+            # if there is an error, no continuation is available
+            continuation = None
+
+        for p in playlists:
+            if 'gridPlaylistRenderer' in p:
+                p['playlistId'] = p['gridPlaylistRenderer']['playlistId']
+            elif 'lockupViewModel' in p:
+                #p["title"] = p['lockupViewModel']['metadata']['lockupMetadataViewModel']['title']['content']
+                p['playlistId'] = p['lockupViewModel']['contentId']
         # remove duplicates
         return (
-            uniqueify(
-                list(
-                    # only extract the video ids from the video data
-                    map(
-                        lambda x: (
-                            f"/playlist?list="
-                            f"{x['gridPlaylistRenderer']['playlistId']}"
-                        ),
-                        playlists
-                    )
-                ),
-            ),
+            uniqueify(list(map(lambda x: f"/playlist?list={x['playlistId']}", playlists))),
             continuation,
         )
 
