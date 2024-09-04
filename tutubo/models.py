@@ -447,24 +447,11 @@ class Channel(Playlist, _Ch):
             if 'gridPlaylistRenderer' in p:
                 p['playlistId'] = p['gridPlaylistRenderer']['playlistId']
             elif 'lockupViewModel' in p:
-                # TODO - i got this one once! but can not replicate consistently...
-                # implement once we can get the output again
-                pass
-
+                #p["title"] = p['lockupViewModel']['metadata']['lockupMetadataViewModel']['title']['content']
+                p['playlistId'] = p['lockupViewModel']['contentId']
         # remove duplicates
         return (
-            uniqueify(
-                list(
-                    # only extract the video ids from the video data
-                    map(
-                        lambda x: (
-                            f"/playlist?list="
-                            f"{x['gridPlaylistRenderer']['playlistId']}"
-                        ),
-                        [p for p in playlists if 'gridPlaylistRenderer' in p]
-                    )
-                ),
-            ),
+            uniqueify(list(map(lambda x: f"/playlist?list={x['playlistId']}", playlists))),
             continuation,
         )
 
