@@ -1,6 +1,6 @@
 import enum
 
-from pytube.contrib.search import Search as _Search
+from tutubo.pytube.contrib.search import Search as _Search
 from tutubo.models import *
 from tutubo.ytmus import *
 
