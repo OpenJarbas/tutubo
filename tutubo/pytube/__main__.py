@@ -381,6 +381,10 @@ class YouTube:
         return int(self.vid_info.get('videoDetails', {}).get('lengthSeconds'))
 
     @property
+    def is_live(self) -> bool:
+        return self.length == 0
+
+    @property
     def views(self) -> int:
         """Get the number of the times the video has been viewed.
 

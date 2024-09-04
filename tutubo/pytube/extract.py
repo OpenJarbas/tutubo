@@ -177,8 +177,10 @@ def channel_name(url: str) -> str:
     if function_match:
         logger.debug("finished regex search, matched: %s", pattern)
         uri_style = function_match.group(1)
-        uri_style = uri_style if uri_style else "c"
         uri_identifier = function_match.group(2)
+        if "@" in url:
+            return f"/@{uri_identifier}"
+        uri_style = uri_style if uri_style else "c"
         return f'/{uri_style}/{uri_identifier}'
 
     raise RegexMatchError(
