@@ -4,6 +4,8 @@ import json
 import logging
 from typing import Dict, List, Tuple, Optional, Iterable
 
+import requests
+
 from tutubo.pytube import extract, YouTube, Playlist, request
 from tutubo.pytube.helpers import uniqueify, cache, DeferredGeneratorList
 
@@ -99,8 +101,6 @@ class Channel(Playlist):
         """
         if self._html:
             return self._html
-        import requests
-        print(self.html_url)
         self._html = requests.get(self.html_url).text
         return self._html
 
