@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/OpenJarbas/tutubo/tree/HEAD)
+## [V2.0.0a1](https://github.com/OpenJarbas/tutubo/tree/V2.0.0a1) (2024-09-06)
 
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.1...HEAD)
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.1...V2.0.0a1)
 
 **Breaking changes:**
 
