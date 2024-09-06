@@ -340,6 +340,8 @@ class YouTube:
         try:
             self._title = self.vid_info['videoDetails']['title']
         except KeyError:
+            # 'playabilityStatus': {'status': 'LOGIN_REQUIRED', 'reason': 'Sign in to confirm you’re not a bot'}
+
             # Check_availability will raise the correct exception in most cases
             #  if it doesn't, ask for a report.
             self.check_availability()
@@ -378,7 +380,7 @@ class YouTube:
 
         :rtype: int
         """
-        return int(self.vid_info.get('videoDetails', {}).get('lengthSeconds'))
+        return int(self.vid_info.get('videoDetails', {}).get('lengthSeconds') or 0)
 
     @property
     def is_live(self) -> bool:
