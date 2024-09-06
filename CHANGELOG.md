@@ -4,18 +4,10 @@
 
 [Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a5...HEAD)
 
-**Breaking changes:**
-
-- test "breaking" label [\#15](https://github.com/OpenJarbas/tutubo/pull/15) ([JarbasAl](https://github.com/JarbasAl))
-
 **Fixed bugs:**
 
 - fix/videos [\#3](https://github.com/OpenJarbas/tutubo/pull/3) ([JarbasAl](https://github.com/JarbasAl))
 - fix/channel\_playlist\_parsing [\#2](https://github.com/OpenJarbas/tutubo/pull/2) ([JarbasAl](https://github.com/JarbasAl))
-
-**Merged pull requests:**
-
-- fix:test [\#14](https://github.com/OpenJarbas/tutubo/pull/14) ([JarbasAl](https://github.com/JarbasAl))
 
 ## [V0.0.2a5](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a5) (2024-09-06)
 
