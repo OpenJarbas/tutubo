@@ -1,29 +1,29 @@
 # Changelog
 
-## [V2.0.0a1](https://github.com/OpenJarbas/tutubo/tree/V2.0.0a1) (2024-09-06)
+## [Unreleased](https://github.com/OpenJarbas/tutubo/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.1...V2.0.0a1)
-
-**Breaking changes:**
-
-- feat!:just a test [\#17](https://github.com/OpenJarbas/tutubo/pull/17) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V1.0.1](https://github.com/OpenJarbas/tutubo/tree/V1.0.1) (2024-09-06)
-
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.0...V1.0.1)
-
-**Merged pull requests:**
-
-- fix:push\_to\_master\_and\_dev [\#16](https://github.com/OpenJarbas/tutubo/pull/16) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V1.0.0](https://github.com/OpenJarbas/tutubo/tree/V1.0.0) (2024-09-06)
-
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a5...V1.0.0)
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V2.0.0...HEAD)
 
 **Fixed bugs:**
 
 - fix/videos [\#3](https://github.com/OpenJarbas/tutubo/pull/3) ([JarbasAl](https://github.com/JarbasAl))
 - fix/channel\_playlist\_parsing [\#2](https://github.com/OpenJarbas/tutubo/pull/2) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V2.0.0](https://github.com/OpenJarbas/tutubo/tree/V2.0.0) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V2.0.0a1...V2.0.0)
+
+## [V2.0.0a1](https://github.com/OpenJarbas/tutubo/tree/V2.0.0a1) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.1...V2.0.0a1)
+
+## [V1.0.1](https://github.com/OpenJarbas/tutubo/tree/V1.0.1) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V1.0.0...V1.0.1)
+
+## [V1.0.0](https://github.com/OpenJarbas/tutubo/tree/V1.0.0) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a5...V1.0.0)
 
 ## [V0.0.2a5](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a5) (2024-09-06)
 
