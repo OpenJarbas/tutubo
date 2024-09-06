@@ -5,19 +5,16 @@ on merge to dev:
 """
 
 import sys
-import re
-from os.path import dirname
+import argparse
+from os.path import abspath
 
-# TODO - read from env var to allow script to be reused
-VERSION_FILE = f"{dirname(dirname(__file__))}/tutubo/version.py"
-
-def read_version():
+def read_version(version_file):
     VERSION_MAJOR = 0
     VERSION_MINOR = 0
     VERSION_BUILD = 0
     VERSION_ALPHA = 0
 
-    with open(VERSION_FILE, 'r') as file:
+    with open(version_file, 'r') as file:
         content = file.read()
     for l in content.split("\n"):
         l = l.strip()
@@ -32,8 +29,8 @@ def read_version():
     return VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_ALPHA
 
 
-def update_version(part):
-    VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_ALPHA = read_version()
+def update_version(part, version_file):
+    VERSION_MAJOR, VERSION_MINOR, VERSION_BUILD, VERSION_ALPHA = read_version(version_file)
 
     if part == 'major':
         VERSION_MAJOR += 1
@@ -50,7 +47,7 @@ def update_version(part):
     elif part == 'alpha':
         VERSION_ALPHA += 1
 
-    with open(VERSION_FILE, 'w') as file:
+    with open(version_file, 'w') as file:
         file.write(f"""# START_VERSION_BLOCK
 VERSION_MAJOR = {VERSION_MAJOR}
 VERSION_MINOR = {VERSION_MINOR}
@@ -60,5 +57,10 @@ VERSION_ALPHA = {VERSION_ALPHA}
 
 
 if __name__ == "__main__":
-    part = sys.argv[1]
-    update_version(part)
+    parser = argparse.ArgumentParser(description='Update the version based on the specified part (major, minor, build, alpha)')
+    parser.add_argument('part', help='Part of the version to update (major, minor, build, alpha)')
+    parser.add_argument('--version-file', help='Path to the version.py file', required=True)
+
+    args = parser.parse_args()
+
+    update_version(args.part, abspath(args.version_file))
