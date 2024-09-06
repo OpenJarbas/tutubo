@@ -2,7 +2,15 @@
 
 ## [Unreleased](https://github.com/OpenJarbas/tutubo/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2...HEAD)
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a3...HEAD)
+
+**Merged pull requests:**
+
+- feat:url [\#8](https://github.com/OpenJarbas/tutubo/pull/8) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a3](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a3) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2...V0.0.2a3)
 
 **Implemented enhancements:**
 
