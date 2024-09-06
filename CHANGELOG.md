@@ -2,27 +2,7 @@
 
 ## [Unreleased](https://github.com/OpenJarbas/tutubo/tree/HEAD)
 
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a4...HEAD)
-
-**Merged pull requests:**
-
-- fix automations [\#9](https://github.com/OpenJarbas/tutubo/pull/9) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V0.0.2a4](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a4) (2024-09-06)
-
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a3...V0.0.2a4)
-
-**Merged pull requests:**
-
-- feat:url [\#8](https://github.com/OpenJarbas/tutubo/pull/8) ([JarbasAl](https://github.com/JarbasAl))
-
-## [V0.0.2a3](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a3) (2024-09-06)
-
-[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2...V0.0.2a3)
-
-**Implemented enhancements:**
-
-- feat/automations [\#4](https://github.com/OpenJarbas/tutubo/pull/4) ([JarbasAl](https://github.com/JarbasAl))
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a5...HEAD)
 
 **Fixed bugs:**
 
@@ -31,8 +11,19 @@
 
 **Merged pull requests:**
 
-- fix:version\_file\_path [\#7](https://github.com/OpenJarbas/tutubo/pull/7) ([JarbasAl](https://github.com/JarbasAl))
-- fix:missing\_import [\#6](https://github.com/OpenJarbas/tutubo/pull/6) ([JarbasAl](https://github.com/JarbasAl))
+- fix:test [\#14](https://github.com/OpenJarbas/tutubo/pull/14) ([JarbasAl](https://github.com/JarbasAl))
+
+## [V0.0.2a5](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a5) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a4...V0.0.2a5)
+
+## [V0.0.2a4](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a4) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2a3...V0.0.2a4)
+
+## [V0.0.2a3](https://github.com/OpenJarbas/tutubo/tree/V0.0.2a3) (2024-09-06)
+
+[Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V0.0.2...V0.0.2a3)
 
 ## [V0.0.2](https://github.com/OpenJarbas/tutubo/tree/V0.0.2) (2024-06-22)
 
