@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: dev
+          ref: master
           fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
       - name: Setup Python
         uses: actions/setup-python@v1
@@ -35,7 +35,7 @@ jobs:
           python -m pip install build wheel
       - name: Remove Alpha tag
         run: |
-          python scripts/remove_alpha.py
+          python scripts/remove_alpha.py --version-file $GITHUB_WORKSPACE/tutubo/version.py
       - name: "Generate release changelog"
         uses: heinrichreimer/github-changelog-generator-action@v2.3
         with:
