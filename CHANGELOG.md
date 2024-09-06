@@ -9,6 +9,10 @@
 - fix/videos [\#3](https://github.com/OpenJarbas/tutubo/pull/3) ([JarbasAl](https://github.com/JarbasAl))
 - fix/channel\_playlist\_parsing [\#2](https://github.com/OpenJarbas/tutubo/pull/2) ([JarbasAl](https://github.com/JarbasAl))
 
+**Merged pull requests:**
+
+- fix:one more test [\#18](https://github.com/OpenJarbas/tutubo/pull/18) ([JarbasAl](https://github.com/JarbasAl))
+
 ## [V2.0.0](https://github.com/OpenJarbas/tutubo/tree/V2.0.0) (2024-09-06)
 
 [Full Changelog](https://github.com/OpenJarbas/tutubo/compare/V2.0.0a1...V2.0.0)
