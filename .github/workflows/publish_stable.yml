@@ -6,15 +6,12 @@ on:
     branches:
       - master
     paths-ignore:
-      - 'version.py'
       - 'test/**'
       - 'examples/**'
       - '.github/**'
       - '.gitignore'
-      - 'LICENSE'
       - 'CHANGELOG.md'
       - 'MANIFEST.in'
-      - 'README.md'
       - 'scripts/**'
   workflow_dispatch:
 
@@ -42,6 +39,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           maxIssues: 50
         id: changelog
+      - name: Commit to master
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Increment Version
+          branch: master
       - name: Commit to dev
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
