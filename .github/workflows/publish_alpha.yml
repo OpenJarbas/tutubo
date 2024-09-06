@@ -47,7 +47,7 @@ jobs:
               MAJOR=1
             elif [ "$label" == "feature" ]; then
               MINOR=1
-            elif [ "$label" == "bug" ]; then
+            elif [ "$label" == "fix" ]; then
               BUILD=1
             fi
           done
