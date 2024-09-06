@@ -36,25 +36,29 @@ jobs:
         run: |
           python -m pip install build wheel
 
-      - name: Debug PR Labels
+      - name: Debug GitHub Event
         run: |
-          echo "Labels: ${{ github.event.pull_request.labels[*].name }}"
+          echo "GitHub Event Payload:"
+          echo "${{ toJson(github.event) }}"
+          
+          echo "Labels in Pull Request:"
+          echo "${{ toJson(github.event.pull_request.labels) }}"
 
       - name: Determine version bump
         id: version_bump
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            LABELS=$(echo "${{ github.event.pull_request.labels[*].name }}" | tr ' ' '\n')
+            LABELS=$(jq -r '.pull_request.labels[].name' <<< "${{ toJson(github.event) }}")
             echo "Labels: $LABELS"
           else
             echo "Not a pull request, defaulting to alpha."
             echo "::set-output name=part::alpha"
           fi
-          
+      
           MAJOR=0
           MINOR=0
           BUILD=0
-
+      
           for label in $LABELS; do
             if [ "$label" == "breaking" ]; then
               MAJOR=1
@@ -64,7 +68,7 @@ jobs:
               BUILD=1
             fi
           done
-
+      
           if [ $MAJOR -eq 1 ]; then
             echo "::set-output name=part::major"
           elif [ $MINOR -eq 1 ]; then
