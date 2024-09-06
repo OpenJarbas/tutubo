@@ -47,14 +47,9 @@ jobs:
       - name: Determine version bump
         id: version_bump
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            LABELS=$(jq -r '.pull_request.labels[].name' <<< "${{ toJson(github.event) }}")
-            echo "Labels: $LABELS"
-          else
-            echo "Not a pull request, defaulting to alpha."
-            echo "::set-output name=part::alpha"
-          fi
-      
+          LABELS=$(echo "${{ toJson(github.event.pull_request.labels) }}" | jq -r '.[].name')
+          echo "Labels: $LABELS"
+          
           MAJOR=0
           MINOR=0
           BUILD=0
