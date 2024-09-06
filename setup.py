@@ -1,4 +1,5 @@
 from setuptools import setup
+import os
 
 PKG_NAME = 'tutubo'
 
