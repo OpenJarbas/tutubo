@@ -2,8 +2,6 @@
 # noreorder
 """
 Pytube: a very serious Python library for downloading YouTube Videos.
-url: https://github.com/pytube/pytube
-site: https://pytube.io/
 """
 __title__ = "pytube"
 __author__ = "Ronnie Ghose, Taylor Fox Dahlin, Nick Ficano"
