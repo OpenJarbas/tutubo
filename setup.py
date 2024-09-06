@@ -30,7 +30,9 @@ def get_version():
 setup(
     name=PKG_NAME,
     version=get_version(),
-    packages=[PKG_NAME],
+    packages=[PKG_NAME,
+              PKG_NAME + ".pytube",
+              PKG_NAME + ".pytube.contrib"],
     url='https://github.com/OpenJarbas/tutubo',
     license='Apache',
     author='jarbasAI',
