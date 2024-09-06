@@ -1,4 +1,4 @@
-# This workflow will generate a distribution and upload it to PyPI
+# This workflow will generate a STABLE distribution and upload it to PyPI
 
 name: Publish Stable Release
 on:
